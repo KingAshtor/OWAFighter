@@ -19,7 +19,7 @@ yRes = 500
 
 # Minumum Y
 yMin = yRes - 50
-# Minumum Y
+# Minumum and Maximum X
 xMin = 20
 xMax = xRes - 50
 
@@ -33,7 +33,7 @@ pygame.display.set_caption('OWA Fighter')
 clock = pygame.time.Clock()
 
 #Sets default values for the fighter class
-START_HP = 100;
+START_HP = 9;
 START_SP = 20;
 DEFAULT_ATK = 5;
 DEFAULT_DEF = 5;
@@ -65,6 +65,39 @@ class console():
             print(item)
 
 
+class LeftWall():
+    def __init__(self, x=0, y=0):
+        self.x = x # X Position
+        self.y = y # Y Position
+        self.w = 19 # Width
+        self.h = 550 # Height
+        self.hitBox = pygame.Rect( (self.x, self.y, self.w, self.h) )
+        self.color = (30, 60, 90 / 2) # Bluezit
+    def draw(self):
+        pygame.draw.rect(gameDisplay, self.color, self.hitBox)
+
+class RightWall():
+    def __init__(self, x=983, y=0):
+        self.x = x # X Position
+        self.y = y # Y Position
+        self.w = 19 # Width
+        self.h = 550 # Height
+        self.hitBox = pygame.Rect( (self.x, self.y, self.w, self.h) )
+        self.color = (30, 60, 90 / 2) # Bluezit
+    def draw(self):
+        pygame.draw.rect(gameDisplay, self.color, self.hitBox)
+
+class Stage():
+    def __init__(self, x=0, y=0):
+        self.x = x # X Position
+        self.y = 481 # Y Position
+        self.w = 3200 # Width
+        self.h = 32 # Height
+        self.hitBox = pygame.Rect( (self.x, self.y, self.w, self.h) )
+        self.color = (30, 60, 90 / 2) # Bluezit
+
+    def draw(self):
+        pygame.draw.rect(gameDisplay, self.color, self.hitBox)
 
 # creates class for player
 class Player():
@@ -80,6 +113,7 @@ class Player():
         self.maxSpeed = 10 # Maximum speed
         self.hitBox = pygame.Rect( (self.x, self.y, self.w, self.h) )
         self.color = (69, 69, 420 / 2) # Bluezit
+        self.hp = START_HP
     def draw(self):
         pygame.draw.rect(gameDisplay, self.color, self.hitBox)
     def moveHorizontal(self, velocity):
@@ -102,6 +136,26 @@ class Player():
 
         self.x = self.x + self.xMom
         self.hitBox = pygame.Rect( (self.x, self.y, self.w, self.h))
+        # If leaving left edge
+        if self.x < xMin:
+            # Put player back in boundaries
+            self.x = xMin
+            # Invert momentum to bounce back
+            self.xMom = self.xMom * -1
+            # If leaving right edge
+        if self.x > 1280 - self.w:
+            self.x = 1280 - self.w
+            self.xMom = self.xMom * -1
+
+        if self.x > xMax:
+            # Put player back in boundaries
+            self.x = xMax
+            # Invert momentum to bounce back
+            self.xMom = self.xMom * -1
+            # If leaving right edge
+        if self.x > 1280 - self.w:
+            self.x = 1280 - self.w
+            self.xMom = self.xMom * -1
 
 
 class Baddy(Player):
@@ -112,6 +166,9 @@ class Baddy(Player):
 
 player0 = Player()
 player1 = Baddy()
+lWall = LeftWall()
+rWall = RightWall()
+stage = Stage()
 console.log('Players created')
 
 while True:
@@ -202,6 +259,10 @@ while True:
         gameDisplay.fill( (0,0,0) ) # Erase screen
         player0.draw()
         player1.draw()
+        lWall.draw()
+        rWall.draw()
+        stage.draw()
+
         pygame.display.update()
         # Wait until tick (60hz) is over
         clock.tick(60)
