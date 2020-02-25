@@ -33,7 +33,7 @@ pygame.display.set_caption('OWA Fighter')
 clock = pygame.time.Clock()
 
 #Sets default values for the fighter class
-START_HP = 9;
+START_HP = 10;
 START_SP = 20;
 DEFAULT_ATK = 5;
 DEFAULT_DEF = 5;
@@ -142,6 +142,10 @@ class Player():
             self.x = xMin
             # Invert momentum to bounce back
             self.xMom = self.xMom * -1
+            # set HP = HP - 1
+            self.hp = self.hp - 1
+            #log
+            console.log('working')
             # If leaving right edge
         if self.x > 1280 - self.w:
             self.x = 1280 - self.w
@@ -152,10 +156,19 @@ class Player():
             self.x = xMax
             # Invert momentum to bounce back
             self.xMom = self.xMom * -1
+            #HP = HP - 1
+            self.hp = self.hp - 1
+            #Log
+            console.log('working')
             # If leaving right edge
         if self.x > 1280 - self.w:
             self.x = 1280 - self.w
             self.xMom = self.xMom * -1
+
+        if self.hp == 0:
+            self.color = (30, 60, 90 / 2)
+            console.log('Game over');
+
 
 
 class Baddy(Player):
@@ -255,6 +268,7 @@ while True:
         # Move objects
         player0.physics()
         player1.physics()
+
         # Update screen
         gameDisplay.fill( (0,0,0) ) # Erase screen
         player0.draw()
