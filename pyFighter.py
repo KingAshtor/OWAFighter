@@ -168,9 +168,7 @@ class Player():
         if self.hp == 0:
             self.color = (30, 60, 90 / 2)
             console.log('Game over');
-
-
-
+            self.hp = 1;
 class Baddy(Player):
     def __init__(self, x=xMax, y=yMin):
         super().__init__(x, y)
