@@ -146,7 +146,7 @@ class Player():
                 if self.yMom > terminalVelocity:
                     #if you are moving above terminalVelocity cap speed to terminalVelocity
                     self.yMom = -terminalVelocity;
-                    if:
+                else:
                     #if below terminalVelocity then cap speed to negitive terminalVelocity
                     self.yMom = terminalVelocity;
 
