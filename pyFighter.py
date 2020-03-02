@@ -36,6 +36,9 @@ pygame.display.set_caption('OWA Fighter')
 # makes the clock object
 clock = pygame.time.Clock()
 
+#makes the buttons exist and default to unpressed
+buttonUp = buttonDown = buttonLeft = buttonRight = buttonUse = buttonJump = buttonJumpLast = buttonUp1 = buttonDown1 = buttonLeft1 = buttonRight1 = buttonUse1 = buttonJump1 = buttonJumpLast1 = False
+
 #Sets default values for the fighter class
 START_HP = 10;
 START_SP = 20;
@@ -49,7 +52,7 @@ P0CHARA = 'crashr';
 P1NAME = 'Sam';
 P1CHARA = 'saml';
 
-#makes list to store the console
+#makes list to store the consoles outputs
 outputList = ["Start",]
 
 #makes console.log
@@ -71,43 +74,8 @@ class console():
         os.system("color 02")
         for item in outputList:
             print(item)
-            
-class LeftWall():
-    def __init__(self, x=0, y=0):
-        self.x = x # X Position
-        self.y = y # Y Position
-        self.w = 19 # Width
-        self.h = 550 # Height
-        self.hitBox = pygame.Rect( (self.x, self.y, self.w, self.h) )
-        self.color = (30, 60, 90 / 2) # Bluezit
-    def draw(self):
-        pygame.draw.rect(gameDisplay, self.color, self.hitBox)
 
-class RightWall():
-    def __init__(self, x=983, y=0):
-        self.x = x # X Position
-        self.y = y # Y Position
-        self.w = 19 # Width
-        self.h = 550 # Height
-        self.hitBox = pygame.Rect( (self.x, self.y, self.w, self.h) )
-        self.color = (30, 60, 90 / 2) # Bluezit
-    def draw(self):
-        pygame.draw.rect(gameDisplay, self.color, self.hitBox)
 
-class Stage():
-    def __init__(self, x=0, y=0):
-        self.x = x # X Position
-        self.y = 481 # Y Position
-        self.w = 3200 # Width
-        self.h = 32 # Height
-        self.hitBox = pygame.Rect( (self.x, self.y, self.w, self.h) )
-        self.color = (30, 60, 90 / 2) # Bluezit
-
-    def draw(self):
-        pygame.draw.rect(gameDisplay, self.color, self.hitBox)
-        
-#makes the buttons exist and default to unpressed
-buttonUp = buttonDown = buttonLeft = buttonRight = buttonUse = buttonJump = buttonJumpLast = buttonUp1 = buttonDown1 = buttonLeft1 = buttonRight1 = buttonUse1 = buttonJump1 = buttonJumpLast1 = False
 
 # creates class for player
 class Player():
@@ -124,14 +92,9 @@ class Player():
         self.maxSpeed = 10 # Maximum speed
         self.hitBox = pygame.Rect( (self.x, self.y, self.w, self.h) )
         self.color = (69, 69, 420 / 2) # Bluezit
-<<<<<<< Updated upstream
         self.hp = START_HP
         self.weight = 1
         self.airborne = False
-=======
-        self.weight = 1 #weight of player used to change jumping
-        self.airborne = False #keeps track of wether the player is
->>>>>>> Stashed changes
     def draw(self):
         #draws the player and its hitBox as a rectangle and also is responsible for assigning color
         pygame.draw.rect(gameDisplay, self.color, self.hitBox)
@@ -207,18 +170,57 @@ class Player():
             self.color = (30, 60, 90 / 2)
             console.log('Game over');
             self.hp = 1;
+
 class Baddy(Player):
     def __init__(self, x=xMax, y=yMin):
         super().__init__(x, y)
         self.color = (420 / 2, 69, 69) # Blazit
 
+class LeftWall():
+    def __init__(self, x=0, y=0):
+        self.x = x # X Position
+        self.y = y # Y Position
+        self.w = 19 # Width
+        self.h = 550 # Height
+        self.hitBox = pygame.Rect( (self.x, self.y, self.w, self.h) )
+        self.color = (30, 60, 90 / 2) # Bluezit
 
+    def draw(self):
+            pygame.draw.rect(gameDisplay, self.color, self.hitBox)
+
+class RightWall():
+    def __init__(self, x=983, y=0):
+        self.x = x # X Position
+        self.y = y # Y Position
+        self.w = 19 # Width
+        self.h = 550 # Height
+        self.hitBox = pygame.Rect( (self.x, self.y, self.w, self.h) )
+        self.color = (30, 60, 90 / 2) # Bluezit
+
+    def draw(self):
+        pygame.draw.rect(gameDisplay, self.color, self.hitBox)
+
+class Stage():
+    def __init__(self, x=0, y=0):
+        self.x = x # X Position
+        self.y = 481 # Y Position
+        self.w = 3200 # Width
+        self.h = 32 # Height
+        self.hitBox = pygame.Rect( (self.x, self.y, self.w, self.h) )
+        self.color = (30, 60, 90 / 2) # Bluezit
+
+    def draw(self):
+        pygame.draw.rect(gameDisplay, self.color, self.hitBox)
+
+
+#Creates Objects
 player0 = Player()
 player1 = Baddy()
+console.log('Players created')
 lWall = LeftWall()
 rWall = RightWall()
 stage = Stage()
-console.log('Players created')
+console.log('Stage created')
 
 while True:
         ### -------------------------------------- ###
@@ -318,13 +320,19 @@ while True:
 
         # Update screen
         gameDisplay.fill( (0,0,0) ) # Erase screen
-        player0.draw()
-        player1.draw()
+
+        #draws the walls and floor
         lWall.draw()
         rWall.draw()
         stage.draw()
 
+        #Draws the players
+        player0.draw()
+        player1.draw()
+
+        #Updates the display
         pygame.display.update()
+
         # Wait until tick (60hz) is over
         time.sleep(.025)
         pass
