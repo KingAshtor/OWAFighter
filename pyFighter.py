@@ -6,10 +6,10 @@
 # 4.Nathan Cunningham
 # 9.Mykahl Luciano
 
-# Imports Pygame
-import pygame;
-import os;
-import time;
+# Imports modules
+import pygame; #Imports pygame used to create the window and game elements
+import os; #Imports os which allows the console to run like windows command line
+import time; #Imports time wich allows the code to use timeing that is easier to understand
 
 # Initiates Pygame
 pygame.init()
@@ -18,7 +18,7 @@ pygame.init()
 xRes = 1000 #Sets Horizontal Resoulution (Xaxis)
 yRes = 500 #Sets Vertical Resoulution (Yaxis)
 
-# Sets the display size
+# Sets the game display size to the resolution varibles
 gameDisplay = pygame.display.set_mode((xRes, yRes))
 
 # Makes Minumum and Maximum Screen Boundries
@@ -33,7 +33,7 @@ terminalVelocity = 100
 # Set the title
 pygame.display.set_caption('OWA Fighter')
 
-# make the clock object
+# makes the clock object
 clock = pygame.time.Clock()
 
 #Sets default values for the fighter class
@@ -124,10 +124,16 @@ class Player():
         self.maxSpeed = 10 # Maximum speed
         self.hitBox = pygame.Rect( (self.x, self.y, self.w, self.h) )
         self.color = (69, 69, 420 / 2) # Bluezit
+<<<<<<< Updated upstream
         self.hp = START_HP
         self.weight = 1
         self.airborne = False
+=======
+        self.weight = 1 #weight of player used to change jumping
+        self.airborne = False #keeps track of wether the player is
+>>>>>>> Stashed changes
     def draw(self):
+        #draws the player and its hitBox as a rectangle and also is responsible for assigning color
         pygame.draw.rect(gameDisplay, self.color, self.hitBox)
     def moveHorizontal(self, velocity):
         if abs(self.xMom) < self.maxSpeed:
