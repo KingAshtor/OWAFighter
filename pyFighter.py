@@ -21,7 +21,7 @@ yRes = 500 #Sets Vertical Resoulution (Yaxis)
 # Sets the game display size to the resolution varibles
 gameDisplay = pygame.display.set_mode((xRes, yRes))
 
-# Makes Minumum and Maximum Screen Boundries
+# Makes Minumum and Maximum For Screen Boundries
 yMin = yRes - 50
 xMin = 20
 xMax = xRes - 50
@@ -70,8 +70,10 @@ class console():
     #makes the console.refresh command
     def refresh():
         # Console clears using the commamd prompt comand cls then it makes it look cool by changing the colors and then lists the entire outputList
-        os.system("cls")
-        os.system("color 02")
+        os.system("cls") #clears the console
+        os.system("color 02") #Makes green so you are a true heckermen
+
+        #for loop used to print all the console.log data
         for item in outputList:
             print(item)
 
@@ -92,16 +94,21 @@ class Player():
         self.maxSpeed = 10 # Maximum speed
         self.hitBox = pygame.Rect( (self.x, self.y, self.w, self.h) )
         self.color = (69, 69, 420 / 2) # Bluezit
-        self.hp = START_HP
-        self.weight = 1
-        self.airborne = False
+        self.hp = START_HP # sets hp to START_HP
+        self.weight = 1 # weight used to modify jump
+        self.airborne = False # tracks wether you are airbourne or note
+
+    # draws the player and its hitBox as a rectangle and also is responsible for assigning color
     def draw(self):
-        #draws the player and its hitBox as a rectangle and also is responsible for assigning color
         pygame.draw.rect(gameDisplay, self.color, self.hitBox)
+    # used to move the player horizontally
     def moveHorizontal(self, velocity):
+
+        # if its its momentum is less then max speed add acceleration to increase velocity
         if abs(self.xMom) < self.maxSpeed:
             self.xMom += (velocity * self.accel)
 
+        # If his speed is greater then or less then max speed set momentum to zero
         if self.x > xMax:
             self.x = xMax
             self.xMom = 0
@@ -109,35 +116,46 @@ class Player():
             self.x = xMin
             self.xMom = 0
 
+    # function for jumping
     def jump(self, power, direction):
+        # if you are not airborne and you jump you then jump and become airbourne
         if not self.airborne:
             self.airborne = True
             self.yMom += (power * 30)
 
     def physics(self):
-        # Horizontal
+        # Horizontal acceleration and deceleration
         if self.xMom > 0:
             self.xMom -= self.decel
         elif self.xMom < 0:
             self.xMom += self.decel
 
+        # if player is below the Minumum then return him to minimum and make them no longer fall or be airbourne
         if self.y > yMin:
             self.airborne = False
             self.y = yMin
             self.yMom = 0
             console.log('Below Min')
 
+        # if player is airbourne then...
         if self.airborne == True:
-            self.yMom += (self.weight + gravity)
+            self.yMom += (self.weight + gravity) #get pulled down by gravity
+
+            #if you are faster then terminalVelocity...
             if abs(self.yMom) > terminalVelocity:
                 if self.yMom > terminalVelocity:
+                    #if you are moving above terminalVelocity cap speed to terminalVelocity
                     self.yMom = -terminalVelocity;
-                else:
+                    if:
+                    #if below terminalVelocity then cap speed to negitive terminalVelocity
                     self.yMom = terminalVelocity;
 
-        self.x += self.xMom
-        self.y += self.yMom
+        self.x += self.xMom #add horizontal movement
+        self.y += self.yMom #add verticle movement
+
+        #move hitbox with player
         self.hitBox = pygame.Rect( (self.x, self.y, self.w, self.h))
+
         # If leaving left edge
         if self.x < xMin:
             # Put player back in boundaries
@@ -147,12 +165,13 @@ class Player():
             # set HP = HP - 1
             self.hp = self.hp - 1
             #log
-            console.log('working')
+            console.log('Out Of Bounds Left!')
             # If leaving right edge
         if self.x > 1280 - self.w:
             self.x = 1280 - self.w
             self.xMom = self.xMom * -1
 
+        # If leaving left edge
         if self.x > xMax:
             # Put player back in boundaries
             self.x = xMax
@@ -161,7 +180,7 @@ class Player():
             #HP = HP - 1
             self.hp = self.hp - 1
             #Log
-            console.log('working')
+            console.log('Out Of Bounds Right!')
             # If leaving right edge
         if self.x > 1280 - self.w:
             self.x = 1280 - self.w
