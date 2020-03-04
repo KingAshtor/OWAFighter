@@ -23,6 +23,7 @@ gameDisplay = pygame.display.set_mode((xRes, yRes))
 
 # Makes Minumum and Maximum For Screen Boundries
 yMin = yRes - 50
+# Minumum Y
 xMin = 20
 xMax = xRes - 50
 
@@ -45,8 +46,8 @@ START_SP = 20;
 DEFAULT_ATK = 5;
 DEFAULT_DEF = 5;
 DEFAULT_TEK = 5;
-
-#sets constants names for fighters
+direc = 0
+#sets constants names
 P0NAME = 'Crash';
 P0CHARA = 'crashr';
 P1NAME = 'Sam';
@@ -55,7 +56,11 @@ P1CHARA = 'saml';
 #makes list to store the consoles outputs
 outputList = ["Start",]
 
-#makes console.log
+enemyDirect = 'left'
+
+#makes the stuff exist
+buttonUp = buttonDown = buttonLeft = buttonRight = buttonUse = buttonUp1 = buttonDown1 = buttonLeft1 = buttonRight1 = buttonUse1 = False
+
 class console():
     # makes console.log command
     def log(phrase):
@@ -79,6 +84,7 @@ class console():
 
 
 
+
 # creates class for player
 class Player():
     def __init__(self, x=xMin, y=yMin):
@@ -94,6 +100,9 @@ class Player():
         self.maxSpeed = 10 # Maximum speed
         self.hitBox = pygame.Rect( (self.x, self.y, self.w, self.h) )
         self.color = (69, 69, 420 / 2) # Bluezit
+        self.weight = 1
+        self.airborne = False
+        self.maxhp = 100
         self.hp = START_HP # sets hp to START_HP
         self.weight = 1 # weight used to modify jump
         self.airborne = False # tracks wether you are airbourne or note
@@ -156,6 +165,15 @@ class Player():
         #move hitbox with player
         self.hitBox = pygame.Rect( (self.x, self.y, self.w, self.h))
 
+#change direction based on momentum pos = right, neg = left
+    # def use(self):
+    #     punches.append( PunchyBoi(self.x + 32, self.y + 12, 'right'))
+    def use(self):
+        punches.append(PunchyBoi(self.x + direc, self.y + 12))
+        console.log('punched')
+        if buttonUse == False:
+            punches.remove(PunchyBoi(self.x + direc, self.y + 12))
+            console.log('unpunch')
         # If leaving left edge
         if self.x < xMin:
             # Put player back in boundaries
@@ -194,6 +212,29 @@ class Baddy(Player):
     def __init__(self, x=xMax, y=yMin):
         super().__init__(x, y)
         self.color = (420 / 2, 69, 69) # Blazit
+
+class PunchyBoi(Player):
+    def __init__(self, x=0, y=0, direction = direc):
+        super().__init__(x, y)
+        self.color = (7, 85, 2)
+        self.h = 8
+        self.direction = direction
+        self.hitBox = pygame.Rect( (self.x, self.y - 12, self.w, 32) )
+        def draw(self):
+            pygame.draw.rect(gameDisplay, self.color, self.hitBox)
+
+    def facing(self):
+        if player0.xMom < 0:
+            direc = self.x - 25
+
+        if playe0.xMom > 0:
+            direc = self.x + 25
+    # def physics(self):
+    #     super().physics()
+    #     if not buttonUse == False:
+    #         punches.remove(self)
+    #         console.log('removed self')
+#if not statement^^^
 
 class LeftWall():
     def __init__(self, x=0, y=0):
@@ -235,11 +276,16 @@ class Stage():
 #Creates Objects
 player0 = Player()
 player1 = Baddy()
+attk = PunchyBoi()
 console.log('Players created')
 lWall = LeftWall()
 rWall = RightWall()
 stage = Stage()
 console.log('Stage created')
+
+punches = []
+
+enemyDirect = []
 
 while True:
         ### -------------------------------------- ###
@@ -269,6 +315,9 @@ while True:
                 # JUMP (SPACE)
                 if event.key == pygame.K_SPACE:
                     buttonJump = True
+                # USE (SPACE)
+                if event.key == pygame.K_g:
+                    buttonUse = True
             # player 1
                 # UP (Up Arrow)
                 if event.key == pygame.K_UP:
@@ -285,6 +334,9 @@ while True:
                 # # Jump (SPACE)
                 if event.key == pygame.K_KP0:
                     buttonJump1 = True
+                # # USE (SPACE)
+                if event.key == pygame.K_p:
+                    buttonUse1 = True
             # If the event is a key RELEASE (up)
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_w:
@@ -297,6 +349,8 @@ while True:
                     buttonRight = False
                 if event.key == pygame.K_SPACE:
                     buttonJump = False
+                if event.key == pygame.K_g:
+                    buttonUse = False
                 #player1
                 if event.key == pygame.K_UP:
                     buttonUp1 = False
@@ -308,6 +362,8 @@ while True:
                     buttonRight1 = False
                 if event.key == pygame.K_KP0:
                     buttonJump1 = False
+                if event.key == pygame.K_p:
+                    buttonUse1 = False
 
         if buttonLeft:
             player0.moveHorizontal(-1)
@@ -330,25 +386,39 @@ while True:
                 buttonJumpLast1 = True
         else:
             buttonJumpLast1 = False
+        if buttonUse:
+            if not buttonuseLast:
+                player0.use()
+                buttonuseLast = True
+        if buttonUse1:
+            if not buttonuseLast:
+                player1.use()
+                buttonuseLast = True
+        else:
+            buttonuseLast = False
+
         ### -------------------------------------- ###
         ### Game Functions
         ### -------------------------------------- ###
         # Move objects
         player0.physics()
         player1.physics()
-
+        attk.physics()
         # Update screen
         gameDisplay.fill( (0,0,0) ) # Erase screen
-
+        player0.draw()
+        player1.draw()
+        
         #draws the walls and floor
         lWall.draw()
         rWall.draw()
         stage.draw()
-
+        
         #Draws the players
         player0.draw()
-        player1.draw()
-
+        for punch in punches:
+            punch.draw()
+            
         #Updates the display
         pygame.display.update()
 
