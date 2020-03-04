@@ -6,10 +6,10 @@
 # 4.Nathan Cunningham
 # 9.Mykahl Luciano
 
-# Imports Pygame
-import pygame;
-import os;
-import time;
+# Imports modules
+import pygame; #Imports pygame used to create the window and game elements
+import os; #Imports os which allows the console to run like windows command line
+import time; #Imports time wich allows the code to use timeing that is easier to understand
 
 # Initiates Pygame
 pygame.init()
@@ -18,10 +18,10 @@ pygame.init()
 xRes = 1000 #Sets Horizontal Resoulution (Xaxis)
 yRes = 500 #Sets Vertical Resoulution (Yaxis)
 
-# Sets the display size
+# Sets the game display size to the resolution varibles
 gameDisplay = pygame.display.set_mode((xRes, yRes))
 
-# Makes Minumum and Maximum Screen Boundries
+# Makes Minumum and Maximum For Screen Boundries
 yMin = yRes - 50
 # Minumum Y
 xMin = 20
@@ -34,11 +34,14 @@ terminalVelocity = 100
 # Set the title
 pygame.display.set_caption('OWA Fighter')
 
-# make the clock object
+# makes the clock object
 clock = pygame.time.Clock()
 
+#makes the buttons exist and default to unpressed
+buttonUp = buttonDown = buttonLeft = buttonRight = buttonUse = buttonJump = buttonJumpLast = buttonUp1 = buttonDown1 = buttonLeft1 = buttonRight1 = buttonUse1 = buttonJump1 = buttonJumpLast1 = False
+
 #Sets default values for the fighter class
-START_HP = 100;
+START_HP = 10;
 START_SP = 20;
 DEFAULT_ATK = 5;
 DEFAULT_DEF = 5;
@@ -50,7 +53,7 @@ P0CHARA = 'crashr';
 P1NAME = 'Sam';
 P1CHARA = 'saml';
 
-#makes list to store the console
+#makes list to store the consoles outputs
 outputList = ["Start",]
 
 enemyDirect = 'left'
@@ -72,13 +75,14 @@ class console():
     #makes the console.refresh command
     def refresh():
         # Console clears using the commamd prompt comand cls then it makes it look cool by changing the colors and then lists the entire outputList
-        os.system("cls")
-        os.system("color 02")
+        os.system("cls") #clears the console
+        os.system("color 02") #Makes green so you are a true heckermen
+
+        #for loop used to print all the console.log data
         for item in outputList:
             print(item)
 
-#makes the buttons exist and default to unpressed
-buttonUp = buttonDown = buttonLeft = buttonRight = buttonUse = buttonJump = buttonJumpLast = buttonUp1 = buttonDown1 = buttonLeft1 = buttonRight1 = buttonUse1 = buttonJump1 = buttonJumpLast1 = False
+
 
 
 # creates class for player
@@ -98,15 +102,22 @@ class Player():
         self.color = (69, 69, 420 / 2) # Bluezit
         self.weight = 1
         self.airborne = False
-        self.hp = 100
         self.maxhp = 100
+        self.hp = START_HP # sets hp to START_HP
+        self.weight = 1 # weight used to modify jump
+        self.airborne = False # tracks wether you are airbourne or note
 
+    # draws the player and its hitBox as a rectangle and also is responsible for assigning color
     def draw(self):
         pygame.draw.rect(gameDisplay, self.color, self.hitBox)
+    # used to move the player horizontally
     def moveHorizontal(self, velocity):
+
+        # if its its momentum is less then max speed add acceleration to increase velocity
         if abs(self.xMom) < self.maxSpeed:
             self.xMom += (velocity * self.accel)
 
+        # If his speed is greater then or less then max speed set momentum to zero
         if self.x > xMax:
             self.x = xMax
             self.xMom = 0
@@ -114,34 +125,44 @@ class Player():
             self.x = xMin
             self.xMom = 0
 
+    # function for jumping
     def jump(self, power, direction):
+        # if you are not airborne and you jump you then jump and become airbourne
         if not self.airborne:
             self.airborne = True
             self.yMom += (power * 30)
 
     def physics(self):
-        # Horizontal
+        # Horizontal acceleration and deceleration
         if self.xMom > 0:
             self.xMom -= self.decel
         elif self.xMom < 0:
             self.xMom += self.decel
 
+        # if player is below the Minumum then return him to minimum and make them no longer fall or be airbourne
         if self.y > yMin:
             self.airborne = False
             self.y = yMin
             self.yMom = 0
             console.log('Below Min')
 
+        # if player is airbourne then...
         if self.airborne == True:
-            self.yMom += (self.weight + gravity)
+            self.yMom += (self.weight + gravity) #get pulled down by gravity
+
+            #if you are faster then terminalVelocity...
             if abs(self.yMom) > terminalVelocity:
                 if self.yMom > terminalVelocity:
+                    #if you are moving above terminalVelocity cap speed to terminalVelocity
                     self.yMom = -terminalVelocity;
                 else:
+                    #if below terminalVelocity then cap speed to negitive terminalVelocity
                     self.yMom = terminalVelocity;
 
-        self.x += self.xMom
-        self.y += self.yMom
+        self.x += self.xMom #add horizontal movement
+        self.y += self.yMom #add verticle movement
+
+        #move hitbox with player
         self.hitBox = pygame.Rect( (self.x, self.y, self.w, self.h))
 
 #change direction based on momentum pos = right, neg = left
@@ -153,6 +174,39 @@ class Player():
         if buttonUse == False:
             punches.remove(PunchyBoi(self.x + direc, self.y + 12))
             console.log('unpunch')
+        # If leaving left edge
+        if self.x < xMin:
+            # Put player back in boundaries
+            self.x = xMin
+            # Invert momentum to bounce back
+            self.xMom = self.xMom * -1
+            # set HP = HP - 1
+            self.hp = self.hp - 1
+            #log
+            console.log('Out Of Bounds Left!')
+            # If leaving right edge
+        if self.x > 1280 - self.w:
+            self.x = 1280 - self.w
+            self.xMom = self.xMom * -1
+
+        # If leaving left edge
+        if self.x > xMax:
+            # Put player back in boundaries
+            self.x = xMax
+            # Invert momentum to bounce back
+            self.xMom = self.xMom * -1
+            #HP = HP - 1
+            self.hp = self.hp - 1
+            #Log
+            console.log('Out Of Bounds Right!')
+            # If leaving right edge
+        if self.x > 1280 - self.w:
+            self.x = 1280 - self.w
+            self.xMom = self.xMom * -1
+        if self.hp == 0:
+            self.color = (30, 60, 90 / 2)
+            console.log('Game over');
+            self.hp = 1;
 
 class Baddy(Player):
     def __init__(self, x=xMax, y=yMin):
@@ -181,10 +235,53 @@ class PunchyBoi(Player):
     #         punches.remove(self)
     #         console.log('removed self')
 #if not statement^^^
+
+class LeftWall():
+    def __init__(self, x=0, y=0):
+        self.x = x # X Position
+        self.y = y # Y Position
+        self.w = 19 # Width
+        self.h = 550 # Height
+        self.hitBox = pygame.Rect( (self.x, self.y, self.w, self.h) )
+        self.color = (30, 60, 90 / 2) # Bluezit
+
+    def draw(self):
+            pygame.draw.rect(gameDisplay, self.color, self.hitBox)
+
+class RightWall():
+    def __init__(self, x=983, y=0):
+        self.x = x # X Position
+        self.y = y # Y Position
+        self.w = 19 # Width
+        self.h = 550 # Height
+        self.hitBox = pygame.Rect( (self.x, self.y, self.w, self.h) )
+        self.color = (30, 60, 90 / 2) # Bluezit
+
+    def draw(self):
+        pygame.draw.rect(gameDisplay, self.color, self.hitBox)
+
+class Stage():
+    def __init__(self, x=0, y=0):
+        self.x = x # X Position
+        self.y = 481 # Y Position
+        self.w = 3200 # Width
+        self.h = 32 # Height
+        self.hitBox = pygame.Rect( (self.x, self.y, self.w, self.h) )
+        self.color = (30, 60, 90 / 2) # Bluezit
+
+    def draw(self):
+        pygame.draw.rect(gameDisplay, self.color, self.hitBox)
+
+
+#Creates Objects
 player0 = Player()
 player1 = Baddy()
 attk = PunchyBoi()
 console.log('Players created')
+lWall = LeftWall()
+rWall = RightWall()
+stage = Stage()
+console.log('Stage created')
 
 punches = []
 
@@ -308,16 +405,23 @@ while True:
         player1.physics()
         attk.physics()
         # Update screen
-        gameDisplay.fill( (200,200,200) ) # Erase screen
+        gameDisplay.fill( (0,0,0) ) # Erase screen
         player0.draw()
         player1.draw()
+        
+        #draws the walls and floor
+        lWall.draw()
+        rWall.draw()
+        stage.draw()
+        
+        #Draws the players
         player0.draw()
         for punch in punches:
             punch.draw()
-        player1.draw()
-        for punch in punches:
-            punch.draw()
+            
+        #Updates the display
         pygame.display.update()
+
         # Wait until tick (60hz) is over
         time.sleep(.025)
         pass
