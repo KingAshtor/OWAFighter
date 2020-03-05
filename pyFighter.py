@@ -2,8 +2,10 @@
 # OWA Employees
 # 1. Ashton Sisson
 # 2.Harry Nelson
-# 3.Daniel Williams
-# 4.Nathan Cunningham
+# 3.Nathan Cunningham
+
+# Previous Employees
+# 4.Daniel Williams
 # 9.Mykahl Luciano
 
 # Imports modules
@@ -97,6 +99,7 @@ class Player():
         self.hp = START_HP # sets hp to START_HP
         self.weight = 1 # weight used to modify jump
         self.airborne = False # tracks wether you are airbourne or note
+        self.name = 'jimmy'
 
     # draws the player and its hitBox as a rectangle and also is responsible for assigning color
     def draw(self):
@@ -333,6 +336,15 @@ while True:
         ### -------------------------------------- ###
         ### Game Functions
         ### -------------------------------------- ###
+
+        #collison Detection
+        if player0.hitBox.colliderect(lWall.hitBox):
+            console.log('walled son')
+            damage(player0.name, 10)
+        #damage script
+        def damage(target, value):
+            console.log(target + ' has taken ' + str(value) + ' damage')
+
         # Move objects
         player0.physics()
         player1.physics()
