@@ -6,6 +6,8 @@
 # 4.Nathan Cunningham
 # 9.Mykahl Luciano
 
+
+#POOP
 # Imports Pygame
 import pygame;
 import os;
@@ -43,7 +45,7 @@ START_SP = 20;
 DEFAULT_ATK = 5;
 DEFAULT_DEF = 5;
 DEFAULT_TEK = 5;
-direc = 0
+direct = 0;
 #sets constants names
 P0NAME = 'Crash';
 P0CHARA = 'crashr';
@@ -55,6 +57,8 @@ outputList = ["Start",]
 
 enemyDirect = 'left'
 
+punches = []
+colliders = []
 #makes the stuff exist
 buttonUp = buttonDown = buttonLeft = buttonRight = buttonUse = buttonUp1 = buttonDown1 = buttonLeft1 = buttonRight1 = buttonUse1 = False
 
@@ -100,6 +104,7 @@ class Player():
         self.airborne = False
         self.hp = 100
         self.maxhp = 100
+        self.direct = 0
 
     def draw(self):
         pygame.draw.rect(gameDisplay, self.color, self.hitBox)
@@ -144,15 +149,18 @@ class Player():
         self.y += self.yMom
         self.hitBox = pygame.Rect( (self.x, self.y, self.w, self.h))
 
-#change direction based on momentum pos = right, neg = left
-    # def use(self):
-    #     punches.append( PunchyBoi(self.x + 32, self.y + 12, 'right'))
     def use(self):
-        punches.append(PunchyBoi(self.x + direc, self.y + 12))
-        console.log('punched')
-        if buttonUse == False:
-            punches.remove(PunchyBoi(self.x + direc, self.y + 12))
-            console.log('unpunch')
+        if self.xMom < 0:
+            self.direct = -40
+        elif self.xMom > 0:
+            self.direct = 40
+        else:
+            self.direct = 0
+
+        punches.append(PunchyBoi(self.x + self.direct, self.y))
+        # console.log('punched')
+
+
 
 class Baddy(Player):
     def __init__(self, x=xMax, y=yMin):
@@ -160,35 +168,27 @@ class Baddy(Player):
         self.color = (420 / 2, 69, 69) # Blazit
 
 class PunchyBoi(Player):
-    def __init__(self, x=0, y=0, direction = direc):
+    def __init__(self, x=xMax, y=yMin):
         super().__init__(x, y)
         self.color = (7, 85, 2)
-        self.h = 8
-        self.direction = direction
-        self.hitBox = pygame.Rect( (self.x, self.y - 12, self.w, 32) )
+        self.h = 32
+        self.hitBox = pygame.Rect( (self.x + self.direct, self.y, self.w, self.h) )
         def draw(self):
             pygame.draw.rect(gameDisplay, self.color, self.hitBox)
 
-    def facing(self):
-        if player0.xMom < 0:
-            direc = self.x - 25
+            self.pos = pygame.Rect( (self.x, self.y, self.w, self.h) )
+            if self.hitBox == self.pos:
+                console.log('DAMAGE!')
+                self.hp - 1
+    # def collide(self, colliders):
+    #     for col in colliders:
+    #         if self.x == self.x + self.direct:
+    #             if self.y == self.y:
 
-        if playe0.xMom > 0:
-            direc = self.x + 25
-    # def physics(self):
-    #     super().physics()
-    #     if not buttonUse == False:
-    #         punches.remove(self)
-    #         console.log('removed self')
-#if not statement^^^
 player0 = Player()
 player1 = Baddy()
 attk = PunchyBoi()
 console.log('Players created')
-
-punches = []
-
-enemyDirect = []
 
 while True:
         ### -------------------------------------- ###
@@ -238,7 +238,7 @@ while True:
                 if event.key == pygame.K_KP0:
                     buttonJump1 = True
                 # # USE (SPACE)
-                if event.key == pygame.K_p:
+                if event.key == pygame.K_KP8:
                     buttonUse1 = True
             # If the event is a key RELEASE (up)
             if event.type == pygame.KEYUP:
@@ -265,7 +265,7 @@ while True:
                     buttonRight1 = False
                 if event.key == pygame.K_KP0:
                     buttonJump1 = False
-                if event.key == pygame.K_p:
+                if event.key == pygame.K_KP8:
                     buttonUse1 = False
 
         if buttonLeft:
@@ -293,6 +293,8 @@ while True:
             if not buttonuseLast:
                 player0.use()
                 buttonuseLast = True
+        else:
+            buttonuseLast = False
         if buttonUse1:
             if not buttonuseLast:
                 player1.use()
@@ -311,12 +313,9 @@ while True:
         gameDisplay.fill( (200,200,200) ) # Erase screen
         player0.draw()
         player1.draw()
-        player0.draw()
         for punch in punches:
             punch.draw()
-        player1.draw()
-        for punch in punches:
-            punch.draw()
+            punches.remove(punch)
         pygame.display.update()
         # Wait until tick (60hz) is over
         time.sleep(.025)
