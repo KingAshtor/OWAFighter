@@ -173,12 +173,10 @@ class Player():
             self.direct = 40
         else:
             self.direct = 0
-            
-        punches.append(PunchyBoi(self.x + direc, self.y + 12))
-        console.log('punched')
-        if buttonUse == False:
-            punches.remove(PunchyBoi(self.x + direc, self.y + 12))
-            console.log('unpunch')
+
+        punches.append(PunchyBoi(self.x + self.direct, self.y))
+        # console.log('punched')
+
         # If leaving left edge
         if self.x < xMin:
             # Put player back in boundaries
@@ -226,17 +224,11 @@ class PunchyBoi(Player):
         self.hitBox = pygame.Rect( (self.x + self.direct, self.y, self.w, self.h) )
         def draw(self):
             pygame.draw.rect(gameDisplay, self.color, self.hitBox)
-            
             self.pos = pygame.Rect( (self.x, self.y, self.w, self.h) )
             if self.hitBox == self.pos:
                 console.log('DAMAGE!')
                 self.hp - 1
-    def facing(self):
-        if player0.xMom < 0:
-            direc = self.x - 25
 
-        if playe0.xMom > 0:
-            direc = self.x + 25
 
 class LeftWall():
     def __init__(self, x=0, y=0):
@@ -405,26 +397,19 @@ while True:
         player1.physics()
         attk.physics()
         # Update screen
-        gameDisplay.fill( (0,0,0) ) # Erase screen
+        gameDisplay.fill( (205,215,200) ) # Erase screen
         player0.draw()
         player1.draw()
-        
-        
-        
-        for punch in punches:
-            punch.draw()
-            punches.remove(punch)
-        
+
         #draws the walls and floor
         lWall.draw()
         rWall.draw()
         stage.draw()
-        
-        #Draws the players
-        player0.draw()
+
         for punch in punches:
             punch.draw()
-            
+            punches.remove(punch)
+
         #Updates the display
         pygame.display.update()
 
