@@ -26,6 +26,8 @@ yMin = yRes - 50
 xMin = 20
 xMax = xRes - 50
 
+x = 15
+y = yRes - 40
 # Creates Gravity and air resistance
 gravity = 1
 terminalVelocity = 100
@@ -37,7 +39,7 @@ pygame.display.set_caption('OWA Fighter')
 clock = pygame.time.Clock()
 
 #Sets default values for the fighter class
-START_HP = 10;
+START_HP = 100;
 START_SP = 20;
 DEFAULT_ATK = 5;
 DEFAULT_DEF = 5;
@@ -71,7 +73,7 @@ class console():
         os.system("color 02")
         for item in outputList:
             print(item)
-            
+
 class LeftWall():
     def __init__(self, x=0, y=0):
         self.x = x # X Position
@@ -105,11 +107,11 @@ class Stage():
 
     def draw(self):
         pygame.draw.rect(gameDisplay, self.color, self.hitBox)
-        
+
 #makes the buttons exist and default to unpressed
 buttonUp = buttonDown = buttonLeft = buttonRight = buttonUse = buttonJump = buttonJumpLast = buttonUp1 = buttonDown1 = buttonLeft1 = buttonRight1 = buttonUse1 = buttonJump1 = buttonJumpLast1 = False
-
-# creates class for player
+#
+# # creates class for player
 class Player():
     def __init__(self, x=xMin, y=yMin):
         self.x = x # X Position
@@ -125,10 +127,24 @@ class Player():
         self.hitBox = pygame.Rect( (self.x, self.y, self.w, self.h) )
         self.color = (69, 69, 420 / 2) # Bluezit
         self.hp = START_HP
+        self.maxhp = START_HP
+        self.maxWidth = 300
         self.weight = 1
         self.airborne = False
-    def draw(self):
+        self.dead = False
+    def draw(self, barX, barY):
         pygame.draw.rect(gameDisplay, self.color, self.hitBox)
+        bgColor = (255, 0, 0)
+        fgColor = (0, 255, 0)
+        barWidth = (self.hp / self.maxhp) * self.maxWidth
+        bgBar = pygame.Rect( (barX, barY, self.maxWidth, 8) )
+        fgBar = pygame.Rect( (barX, barY, barWidth, 8) )
+        pygame.draw.rect(gameDisplay, bgColor, bgBar)
+        if self.dead == False:
+            pygame.draw.rect(gameDisplay, fgColor, fgBar)
+
+        if self.hp == 0:
+            self.dead = True
     def moveHorizontal(self, velocity):
         if abs(self.xMom) < self.maxSpeed:
             self.xMom += (velocity * self.accel)
@@ -200,7 +216,6 @@ class Player():
         if self.hp == 0:
             self.color = (30, 60, 90 / 2)
             console.log('Game over');
-            self.hp = 1;
 class Baddy(Player):
     def __init__(self, x=xMax, y=yMin):
         super().__init__(x, y)
@@ -309,15 +324,14 @@ while True:
         # Move objects
         player0.physics()
         player1.physics()
-
         # Update screen
         gameDisplay.fill( (0,0,0) ) # Erase screen
-        player0.draw()
-        player1.draw()
+        player0.draw(20,0)
+        player1.draw(683,0)
         lWall.draw()
         rWall.draw()
         stage.draw()
-
+        # healthCounter.draw()
         pygame.display.update()
         # Wait until tick (60hz) is over
         time.sleep(.025)
