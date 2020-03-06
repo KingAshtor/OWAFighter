@@ -106,14 +106,15 @@ class Player():
         self.maxSpeed = 10 # Maximum speed
         self.hitBox = pygame.Rect( (self.x, self.y, self.w, self.h) )
         self.color = (69, 69, 420 / 2) # Bluezit
-        self.hp = START_HP
         self.maxhp = START_HP
         self.maxWidth = 300
-        self.weight = 1
-        self.airborne = False
         self.dead = False
-        
-        #bullcrap starts here
+        self.direct = 0
+        self.hp = START_HP # sets hp to START_HP
+        self.weight = 1 # weight used to modify jump
+        self.airborne = False # tracks wether you are airbourne or note
+
+    # draws the player and its hitBox as a rectangle and also is responsible for assigning color
     def draw(self, barX, barY):
         pygame.draw.rect(gameDisplay, self.color, self.hitBox)
         bgColor = (255, 0, 0)
@@ -124,20 +125,9 @@ class Player():
         pygame.draw.rect(gameDisplay, bgColor, bgBar)
         if self.dead == False:
             pygame.draw.rect(gameDisplay, fgColor, fgBar)
+            if self.hp == 0:
+                self.dead = True
 
-        if self.hp == 0:
-            self.dead = True
-            
-         #bull crap ends
-        self.maxhp = 100
-        self.direct = 0
-        self.hp = START_HP # sets hp to START_HP
-        self.weight = 1 # weight used to modify jump
-        self.airborne = False # tracks wether you are airbourne or note
-
-    # draws the player and its hitBox as a rectangle and also is responsible for assigning color
-    def draw(self):
-        pygame.draw.rect(gameDisplay, self.color, self.hitBox)
     # used to move the player horizontally
     def moveHorizontal(self, velocity):
 
@@ -422,12 +412,11 @@ while True:
         player1.physics()
         # Update screen
         gameDisplay.fill( (0,0,0) ) # Erase screen
-        player0.draw(20,0)
-        player1.draw(683,0)
+        player0.draw(20, 0)
+        player1.draw(683, 0)
         lWall.draw()
         rWall.draw()
         stage.draw()
-        # healthCounter.draw()
         attk.physics()
 
         for punch in punches:
