@@ -213,6 +213,11 @@ class Player():
         if self.x > 1280 - self.w:
             self.x = 1280 - self.w
             self.xMom = self.xMom * -1
+
+        # if self.y < 0:
+            # Put player back in boundaries
+            # self.y = yMin
+
         if self.hp == 0:
             self.color = (30, 60, 90 / 2)
             console.log('Game over');
