@@ -182,18 +182,6 @@ class Player():
 
         #move hitbox with player
         self.hitBox = pygame.Rect( (self.x, self.y, self.w, self.h))
-
-    def use(self):
-        if self.xMom < 0:
-            self.direct = -40
-        elif self.xMom > 0:
-            self.direct = 40
-        else:
-            self.direct = 0
-
-        punches.append(PunchyBoi(self.x + self.direct, self.y))
-        # console.log('punched')
-
         # If leaving left edge
         if self.x < xMin:
             # Put player back in boundaries
@@ -223,9 +211,22 @@ class Player():
         if self.x > 1280 - self.w:
             self.x = 1280 - self.w
             self.xMom = self.xMom * -1
+
+        #If hp is zero then its game over
         if self.hp == 0:
             self.color = (30, 60, 90 / 2)
             console.log('Game over');
+
+    def use(self):
+        if self.xMom < 0:
+            self.direct = -40
+        elif self.xMom > 0:
+            self.direct = 40
+        else:
+            self.direct = 0
+        punches.append(PunchyBoi(self.x + self.direct, self.y))
+
+
 class Baddy(Player):
     def __init__(self, x=xMax, y=yMin):
         super().__init__(x, y)
@@ -282,16 +283,22 @@ class Stage():
         pygame.draw.rect(gameDisplay, self.color, self.hitBox)
 
 
-#Creates Objects
+#Creates Players
 player0 = Player()
 player1 = Baddy()
-attk = PunchyBoi()
 console.log('Players created')
+
+#Creates The Attack
+attk = PunchyBoi()
+console.log('Attack created')
+
+#Creates Walls and Floor
 lWall = LeftWall()
 rWall = RightWall()
 stage = Stage()
 console.log('Stage created')
 
+#Loop that reuns the majority of the code
 while True:
         ### -------------------------------------- ###
         ### Keyboard Events for Controls
@@ -411,16 +418,22 @@ while True:
         player0.physics()
         player1.physics()
         # Update screen
-        gameDisplay.fill( (0,0,0) ) # Erase screen
+        gameDisplay.fill( (0,0,0) )
+
+        #Draws players
         player0.draw(20, 0)
         player1.draw(683, 0)
+
+        #Draws walls and floor
         lWall.draw()
         rWall.draw()
         stage.draw()
+
+        #draws attack?
         attk.physics()
 
         for punch in punches:
-            punch.draw()
+            punch.draw(100000,0)
             punches.remove(punch)
 
         #Updates the display
