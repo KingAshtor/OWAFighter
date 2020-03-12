@@ -238,10 +238,11 @@ class PunchyBoi(Player):
         self.color = (7, 85, 2)
         self.h = 32
         if buttonUse:
-            self.hitBox = pygame.Rect( (self.x + self.direct, self.y, self.w, self.h) )
+            self.slap()
+    def slap(self):
+        self.hitBox = pygame.Rect( (self.x + self.direct, self.y, self.w, self.h) )
 
-            console.log('hello')
-
+        pygame.groupcollide(Group1, Group2, doDamage1 = False, doDamage2 = False, collided = None)
         # def draw(self):
             # pygame.draw.rect(gameDisplay, self.color, self.hitBox)
             # self.pos = pygame.Rect( (self.x, self.y, self.w, self.h) )
