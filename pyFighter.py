@@ -117,10 +117,10 @@ class Player():
         self.weight = 1 # weight used to modify jump
         self.airborne = False # tracks wether you are airbourne or note
         self.name = 'jimmy' #adds a name
-        self.offset = 0
-        self.jumpHeight = 1000
-        self.i = 0
-        self.doGravity = False
+        self.offset = 0 #find how far you are from the ground
+        self.jumpHeight = 1000 #customisable jump height
+        self.i = 0 #used as a timer
+        self.doGravity = False #wether gravity currently exists so you dont keep falling through the floor
 
     # draws the player and its hitBox as a rectangle and also is responsible for assigning color
     def draw(self, barX, barY):
@@ -167,22 +167,28 @@ class Player():
         # self.yMom += (self.weight + gravity) #get pulled down by gravity
         fallPerCycle = (gravity * .025**2 )/2
 
+        #runs while you are infuenced by gravity
         while self.doGravity:
-            apex = self.y + self.jumpHeight
-            landtime = math.sqrt(abs((2 * apex / gravity)))
+            apex = self.y + self.jumpHeight #finds the apex of your jump
+            landtime = math.sqrt(abs((2 * apex / gravity))) #finds the total time you are in the air
+            #as long as you are under the maximum possible air time
             if self.i <= landtime * 2:
+                #if you are befoe 1/2 of the total jump then you move up and add time to the counter then waits untill next frame
                 if self.i < landtime:
                     self.y -= fallPerCycle
                     self.i = self.i + .025
                     self.doGravity = False
                     # console.log('going up')
+                #if you are after 1/2 of the total jump then you move down and add time to the counter then waits untill next frame
                 elif self.i >= landtime:
                     self.y += fallPerCycle
                     self.i = self.i + .025
                     self.doGravity = False
                     # console.log('going down')
+            #if you are at the apex of your jump then set timer to 1/2 to begin falling (allows for platforms and double jump)
             elif self.y == apex:
                 self.i = landtime
+            #once its done then reset timer and set airbourne to false
             else:
                 # console.log('landed')
                 self.i = 0
