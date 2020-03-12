@@ -237,13 +237,17 @@ class PunchyBoi(Player):
         super().__init__(x, y)
         self.color = (7, 85, 2)
         self.h = 32
-        self.hitBox = pygame.Rect( (self.x + self.direct, self.y, self.w, self.h) )
-        def draw(self):
-            pygame.draw.rect(gameDisplay, self.color, self.hitBox)
-            self.pos = pygame.Rect( (self.x, self.y, self.w, self.h) )
-            if self.hitBox == self.pos:
-                console.log('DAMAGE!')
-                self.hp - 1
+        if buttonUse:
+            self.hitBox = pygame.Rect( (self.x + self.direct, self.y, self.w, self.h) )
+
+            console.log('hello')
+
+        # def draw(self):
+            # pygame.draw.rect(gameDisplay, self.color, self.hitBox)
+            # self.pos = pygame.Rect( (self.x, self.y, self.w, self.h) )
+            # if self.hitBox == self.pos:
+            #     console.log('DAMAGE!')
+            #     self.hp - 1
 
 
 class LeftWall():
@@ -418,7 +422,7 @@ while True:
         player0.physics()
         player1.physics()
         # Update screen
-        gameDisplay.fill( (0,0,0) )
+        gameDisplay.fill( (205,215,200) )
 
         #Draws players
         player0.draw(20, 0)
@@ -433,7 +437,7 @@ while True:
         attk.physics()
 
         for punch in punches:
-            punch.draw(100000,0)
+            punch.draw(0,0)
             punches.remove(punch)
 
         #Updates the display
