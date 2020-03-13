@@ -10,7 +10,6 @@
 import pygame;
 import os;
 import time;
-
 # Initiates Pygame
 pygame.init()
 
@@ -20,6 +19,8 @@ yRes = 500 #Sets Vertical Resoulution (Yaxis)
 
 # Sets the display size
 gameDisplay = pygame.display.set_mode((xRes, yRes))
+healthFont = pygame.font.Font('consola.ttf', 16);
+deathFont = pygame.font.Font('consola.ttf', 32);
 
 # Makes Minumum and Maximum Screen Boundries
 yMin = yRes - 50
@@ -74,28 +75,6 @@ class console():
         for item in outputList:
             print(item)
 
-class LeftWall():
-    def __init__(self, x=0, y=0):
-        self.x = x # X Position
-        self.y = y # Y Position
-        self.w = 19 # Width
-        self.h = 550 # Height
-        self.hitBox = pygame.Rect( (self.x, self.y, self.w, self.h) )
-        self.color = (30, 60, 90 / 2) # Bluezit
-    def draw(self):
-        pygame.draw.rect(gameDisplay, self.color, self.hitBox)
-
-class RightWall():
-    def __init__(self, x=983, y=0):
-        self.x = x # X Position
-        self.y = y # Y Position
-        self.w = 19 # Width
-        self.h = 550 # Height
-        self.hitBox = pygame.Rect( (self.x, self.y, self.w, self.h) )
-        self.color = (30, 60, 90 / 2) # Bluezit
-    def draw(self):
-        pygame.draw.rect(gameDisplay, self.color, self.hitBox)
-
 class Stage():
     def __init__(self, x=0, y=0):
         self.x = x # X Position
@@ -107,6 +86,8 @@ class Stage():
 
     def draw(self):
         pygame.draw.rect(gameDisplay, self.color, self.hitBox)
+        pygame.draw.rect(gameDisplay, self.color, (983, 0, 19, 550))
+        pygame.draw.rect(gameDisplay, self.color, (0, 0, 19, 550))
 
 #makes the buttons exist and default to unpressed
 buttonUp = buttonDown = buttonLeft = buttonRight = buttonUse = buttonJump = buttonJumpLast = buttonUp1 = buttonDown1 = buttonLeft1 = buttonRight1 = buttonUse1 = buttonJump1 = buttonJumpLast1 = False
@@ -132,6 +113,7 @@ class Player():
         self.weight = 1
         self.airborne = False
         self.dead = False
+        self.name = P0NAME
     def draw(self, barX, barY):
         pygame.draw.rect(gameDisplay, self.color, self.hitBox)
         bgColor = (255, 0, 0)
@@ -145,6 +127,18 @@ class Player():
 
         if self.hp == 0:
             self.dead = True
+            deadText = deathFont.render(self.name + ' is dead', True, self.color)
+            deadTextRect = deadText.get_rect()
+            gameDisplay.blit(deadText, (375,250))
+
+        text = healthFont.render('Player 1: ' + P0NAME, True, (69, 69, 420 / 2))
+        textRect = text.get_rect()
+        gameDisplay.blit(text, (20,10))
+
+        text2 = healthFont.render('Player 2: ' + P1NAME, True, (420 / 2, 69, 69))
+        textRect2 = text.get_rect()
+        gameDisplay.blit(text2, (683,10))
+
     def moveHorizontal(self, velocity):
         if abs(self.xMom) < self.maxSpeed:
             self.xMom += (velocity * self.accel)
@@ -194,7 +188,7 @@ class Player():
             # set HP = HP - 1
             self.hp = self.hp - 1
             #log
-            console.log('working')
+            console.log('Player ' + P0NAME + ' has ' + str(self.hp))
             # If leaving right edge
         if self.x > 1280 - self.w:
             self.x = 1280 - self.w
@@ -208,7 +202,7 @@ class Player():
             #HP = HP - 1
             self.hp = self.hp - 1
             #Log
-            console.log('working')
+            console.log('Player ' + P1NAME + ' has ' + str(self.hp))
             # If leaving right edge
         if self.x > 1280 - self.w:
             self.x = 1280 - self.w
@@ -218,19 +212,15 @@ class Player():
             # Put player back in boundaries
             # self.y = yMin
 
-        if self.hp == 0:
-            self.color = (30, 60, 90 / 2)
-            console.log('Game over');
 class Baddy(Player):
     def __init__(self, x=xMax, y=yMin):
         super().__init__(x, y)
         self.color = (420 / 2, 69, 69) # Blazit
+        self.name = P1NAME
 
 
 player0 = Player()
 player1 = Baddy()
-lWall = LeftWall()
-rWall = RightWall()
 stage = Stage()
 console.log('Players created')
 
@@ -333,11 +323,9 @@ while True:
         gameDisplay.fill( (0,0,0) ) # Erase screen
         player0.draw(20,0)
         player1.draw(683,0)
-        lWall.draw()
-        rWall.draw()
         stage.draw()
-        # healthCounter.draw()
         pygame.display.update()
+        gameDisplay.fill((255, 255, 255))
         # Wait until tick (60hz) is over
         time.sleep(.025)
         pass
