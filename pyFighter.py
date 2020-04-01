@@ -2,8 +2,10 @@
 # OWA Employees
 # 1. Ashton Sisson
 # 2.Harry Nelson
-# 3.Daniel Williams
-# 4.Nathan Cunningham
+# 3.Nathan Cunningham
+
+# Previous Employees
+# 4.Daniel Williams
 # 9.Mykahl Luciano
 
 # Imports Pygame
@@ -11,6 +13,7 @@
 import pygame; #Imports pygame used to create the window and game elements
 import os; #Imports os which allows the console to run like windows command line
 import time; #Imports time wich allows the code to use timeing that is easier to understand
+import math; #Imports the math
 
 # Initiates Pygame
 pygame.init()
@@ -33,7 +36,7 @@ xMax = xRes - 50
 x = 15
 y = yRes - 40
 # Creates Gravity and air resistance
-gravity = 1
+gravity = 100000
 terminalVelocity = 100
 
 # Set the title
@@ -129,6 +132,11 @@ class Player():
         self.hp = START_HP # sets hp to START_HP
         self.weight = 1 # weight used to modify jump
         self.airborne = False # tracks wether you are airbourne or note
+        self.name = 'jimmy' #adds a name
+        self.offset = 0 #find how far you are from the ground
+        self.jumpHeight = 1000 #customisable jump height
+        self.i = 0 #used as a timer
+        self.doGravity = False #wether gravity currently exists so you dont keep falling through the floor
 
     # draws the player and its hitBox as a rectangle and also is responsible for assigning color
     def draw(self, barX, barY):
@@ -177,7 +185,47 @@ class Player():
         # if you are not airborne and you jump you then jump and become airbourne
         if not self.airborne:
             self.airborne = True
-            self.yMom += (power * 30)
+            self.doGravity = True
+            # self.yMom += (power * 30)
+
+
+    def gravityStuff(self):
+        #calculates how far from the ground is
+        self.offest = self.y - yMin
+
+        # self.yMom += (self.weight + gravity) #get pulled down by gravity
+        fallPerCycle = (gravity * .025**2 )/2
+
+        #runs while you are infuenced by gravity
+        while self.doGravity:
+            apex = self.y + self.jumpHeight #finds the apex of your jump
+            landtime = math.sqrt(abs((2 * apex / gravity))) #finds the total time you are in the air
+            #as long as you are under the maximum possible air time
+            if self.i <= landtime * 2:
+                #if you are befoe 1/2 of the total jump then you move up and add time to the counter then waits untill next frame
+                if self.i < landtime:
+                    self.y -= fallPerCycle
+                    self.i = self.i + .025
+                    self.doGravity = False
+                    # console.log('going up')
+                #if you are after 1/2 of the total jump then you move down and add time to the counter then waits untill next frame
+                elif self.i >= landtime:
+                    self.y += fallPerCycle
+                    self.i = self.i + .025
+                    self.doGravity = False
+                    # console.log('going down')
+            #if you are at the apex of your jump then set timer to 1/2 to begin falling (allows for platforms and double jump)
+            elif self.y == apex:
+                self.i = landtime
+            #once its done then reset timer and set airbourne to false
+            else:
+                # console.log('landed')
+                self.i = 0
+                self.airborne = False
+                self.doGravity = False
+
+
+
 
     def physics(self):
         # Horizontal acceleration and deceleration
@@ -185,6 +233,8 @@ class Player():
             self.xMom -= self.decel
         elif self.xMom < 0:
             self.xMom += self.decel
+
+
 
         # if player is below the Minumum then return him to minimum and make them no longer fall or be airbourne
         if self.y > yMin:
@@ -194,9 +244,8 @@ class Player():
             console.log('Below Min')
 
         # if player is airbourne then...
-        if self.airborne == True:
-            self.yMom += (self.weight + gravity) #get pulled down by gravity
-
+        if self.airborne:
+            self.doGravity = True
             #if you are faster then terminalVelocity...
             if abs(self.yMom) > terminalVelocity:
                 if self.yMom > terminalVelocity:
@@ -207,7 +256,7 @@ class Player():
                     self.yMom = terminalVelocity;
 
         self.x += self.xMom #add horizontal movement
-        self.y += self.yMom #add verticle movement
+        # self.y += fall #add verticle movement
 
         #move hitbox with player
         self.hitBox = pygame.Rect( (self.x, self.y, self.w, self.h))
@@ -448,9 +497,20 @@ while True:
         ### -------------------------------------- ###
         ### Game Functions
         ### -------------------------------------- ###
+
+        #collison Detection
+        if player0.hitBox.colliderect(lWall.hitBox):
+            console.log('walled son')
+            damage(player0.name, 10)
+        #damage script
+        def damage(target, value):
+            console.log(target + ' has taken ' + str(value) + ' damage')
+
         # Move objects
         player0.physics()
+        player0.gravityStuff()
         player1.physics()
+        player1.gravityStuff()
         # Update screen
         gameDisplay.fill( (0,0,0) ) # Erase screen
         player0.draw(20,0) # Draw the first player
