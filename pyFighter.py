@@ -517,7 +517,6 @@ while True:
         player1.draw(683,0) #draw the second player
         stage.draw()
         pygame.display.update()
-        gameDisplay.fill((255, 255, 255))
 
         #draws attack?
         attk.physics()
