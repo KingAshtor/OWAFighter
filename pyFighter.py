@@ -321,8 +321,8 @@ while True:
         player1.physics()
         # Update screen
         gameDisplay.fill( (0,0,0) ) # Erase screen
-        player0.draw(20,0)
-        player1.draw(683,0)
+        player0.draw(20,0) # Draw the first player
+        player1.draw(683,0) #draw the second player
         stage.draw()
         pygame.display.update()
         gameDisplay.fill((255, 255, 255))
