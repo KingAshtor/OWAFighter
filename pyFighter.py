@@ -437,6 +437,7 @@ while True:
         #draws attack?
         attk.physics()
 
+        #removes the punch hitbox
         for punch in punches:
             punch.draw(0,0)
             punches.remove(punch)
